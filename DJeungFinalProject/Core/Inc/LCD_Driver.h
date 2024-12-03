@@ -22,6 +22,7 @@
 
 #define LCD_PIXEL_FORMAT_1     LTDC_PIXEL_FORMAT_RGB565
 
+#define LCD_COLOR_BROWN			0x9b87
 #define LCD_COLOR_WHITE         0xFFFF
 #define LCD_COLOR_BLACK         0x0000
 #define LCD_COLOR_GREY          0xF7DE
@@ -65,6 +66,7 @@ void LCD_SetFont(FONT_t *fonts);
 // Draw Circle Filled
 void LCD_Draw_Circle_Fill(uint16_t Xpos, uint16_t Ypos, uint16_t radius, uint16_t color);
 void LCD_Draw_Square_Fill(uint16_t Xpos, uint16_t Ypos, uint16_t length, uint16_t color);
+
 // Draw Vertical Line
 void LCD_Draw_Vertical_Line(uint16_t x, uint16_t y, uint16_t len, uint16_t color);
 void LCD_Clear(uint8_t LayerIndex, uint16_t Color);
@@ -73,6 +75,9 @@ void LCD_Error_Handler(void);
 
 // Demo using provided functions
 void visualDemo(void);
+
+void LCD_DrawMonkey(uint16_t x, uint16_t y);
+void LCD_HomeScreen(void);
 
 void LCD_Error_Handler(void);
 

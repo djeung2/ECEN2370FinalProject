@@ -4,7 +4,6 @@
  *  Created on: Dec 30, 2023 (updated 11/12/2024) Thanks Donavon! 
  *      Author: Xavion
  */
-
 #include "ApplicationCode.h"
 
 /* Static variables */
@@ -22,6 +21,7 @@ void LCDTouchScreenInterruptGPIOInit(void);
 
 void ApplicationInit(void)
 {
+	 __HAL_RCC_RNG_CLK_ENABLE();
 	initialise_monitor_handles(); // Allows printf functionality
     LTCD__Init();
     LTCD_Layer_Init(0);
@@ -44,6 +44,23 @@ void ApplicationInit(void)
 void LCD_Visual_Demo(void)
 {
 	visualDemo();
+}
+
+void LCD_spawn_block(void)
+{
+
+	uint32_t randomNumber;
+	//HAL_RNG_GenerateRandomNumber(&hrng, &randomNumber);
+
+
+
+
+}
+
+void LCD_home_screen(void)
+{
+	LCD_Clear(0, LCD_COLOR_WHITE);
+
 }
 
 #if COMPILE_TOUCH_FUNCTIONS == 1

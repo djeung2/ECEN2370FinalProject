@@ -90,17 +90,8 @@ int main(void)
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
-  /* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
-  //SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
+  SystemClockOverride();
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C3_Init();
@@ -112,17 +103,50 @@ int main(void)
   /* USER CODE BEGIN 2 */
   ApplicationInit(); // Initializes the LCD functionality
 
-  //LCD_Visual_Demo();
-  LCD_Draw_Square_Fill(120, 120, 50, LCD_COLOR_BLUE);
-  HAL_Delay(5000);
-  /* USER CODE END 2 */
+  // game setup
+  static bool aliveFlag = 1;
+  static uint16_t level = 1;
+  static bool gameGrid[12][8] = {0};
 
-  /* Infinite loop */
+
+  //experiment and homescreen
+
+  LCD_Draw_Square_Fill(120, 120, 50, LCD_COLOR_BROWN);
+  HAL_Delay(500);
+  LCD_DrawMonkey(50, 100);
+  HAL_Delay(500);
+  LCD_Clear(0, LCD_COLOR_WHITE);
+  LCD_HomeScreen();
+  HAL_Delay(5000);
+  /* game screen   */
+
+
+  //need to start timer
+
+/*
+  while (aliveFlag && (level < 11))
+  {
+	  for (i = 1; i < level; i++)
+		  LCD_spawn_block();
+
+
+	  level++;
+  }
+
+*/
+  /* End Screen */
+
+  uint32_t randomNumber;
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  hrng.Instance = RNG;
+		if (HAL_RNG_Init(&hrng) != HAL_OK)
+		{
+		  Error_Handler();
+		}
+	  randomNumber = HAL_RNG_GetRandomNumber(&hrng);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

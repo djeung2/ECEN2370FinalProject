@@ -214,6 +214,8 @@ void LCD_Draw_Pixel(uint16_t x, uint16_t y, uint16_t color)
  * Instead all of these are explicit where color, size, and position are passed in.
  * There is tons of ways to handle drawing. I dont think it matters too much.
  */
+
+
 void LCD_Draw_Circle_Fill(uint16_t Xpos, uint16_t Ypos, uint16_t radius, uint16_t color)
 {
     for(int16_t y=-radius; y<=radius; y++)
@@ -261,6 +263,7 @@ void LCD_SetTextColor(uint16_t Color)
 {
   CurrentTextColor = Color;
 }
+
 
 //This was taken and adapted from stm32's mcu code
 void LCD_SetFont(FONT_t *fonts)
@@ -345,6 +348,48 @@ void visualDemo(void)
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
+
+void LCD_DrawMonkey(uint16_t x, uint16_t y)
+{
+
+	    // Head
+	    LCD_Draw_Circle_Fill(x, y, 30, LCD_COLOR_BROWN);
+
+	    // Ears
+	    LCD_Draw_Circle_Fill(x - 30, y, 10, LCD_COLOR_BROWN); // Left ear
+	    LCD_Draw_Circle_Fill(x + 30, y, 10, LCD_COLOR_BROWN); // Right ear
+
+	    // Eyes
+	    LCD_Draw_Circle_Fill(x - 10, y - 10, 2, LCD_COLOR_BLACK); // Left eye (black)
+	    LCD_Draw_Circle_Fill(x + 10, y - 10, 2, LCD_COLOR_BLACK); // Right eye (black)
+
+	    // Nose
+	    LCD_Draw_Circle_Fill(x, y, 2, LCD_COLOR_BLACK); // Nose (black)
+
+	    // Mouth
+	    for (int xx = x - 5; xx <= x + 5; xx++) {
+	    	LCD_Draw_Pixel(xx, y + 10, LCD_COLOR_BLACK); // Mouth (black)
+	    }
+}
+
+void LCD_HomeScreen(void)
+{
+	LCD_SetTextColor(LCD_COLOR_BLACK);
+	LCD_SetFont(&Font16x24);
+
+	LCD_DrawMonkey(120, 50);
+
+	LCD_DisplayChar(90, 160, 'C');
+	LCD_DisplayChar(105, 160, 'H');
+	LCD_DisplayChar(120, 160, 'I');
+	LCD_DisplayChar(135, 160, 'M');
+	LCD_DisplayChar(150, 160, 'P');
+
+	LCD_DisplayChar(100, 180, 'T');
+	LCD_DisplayChar(115, 180, 'E');
+	LCD_DisplayChar(130, 180, 'S');
+	LCD_DisplayChar(145, 180, 'T');
+}
 void LCD_Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */

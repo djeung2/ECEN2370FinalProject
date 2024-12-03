@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include "stm32f4xx_hal.h"
 
-#define COMPILE_TOUCH  0
+#define COMPILE_TOUCH  1
 #define COMPILE_TOUCH_INTERRUPT_SUPPORT    0
 
 #if (COMPILE_TOUCH_INTERRUPT_SUPPORT == 1 && COMPILE_TOUCH == 0)
