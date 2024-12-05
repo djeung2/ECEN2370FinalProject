@@ -50,6 +50,8 @@ SPI_HandleTypeDef hspi5;
 
 TIM_HandleTypeDef htim6;
 TIM_HandleTypeDef htim7;
+static uint16_t gameGrid[3][4];
+
 
 /* USER CODE BEGIN PV */
 
@@ -100,6 +102,7 @@ int main(void)
   MX_SPI5_Init();
   MX_TIM6_Init();
   MX_TIM7_Init();
+  InitializeLCDTouch();
   /* USER CODE BEGIN 2 */
   ApplicationInit(); // Initializes the LCD functionality
 
@@ -109,8 +112,13 @@ int main(void)
 
 
 
-
   //experiment and homescreen
+  spawn_random_block(12);
+
+  for (uint8_t i = 0; i<)
+
+  HAL_Delay(10000);
+  LCD_Clear(0, LCD_COLOR_WHITE);
   for (uint16_t level = 1; level <= level_max; level++)
   {
 	  spawn_random_block(level);
@@ -168,10 +176,11 @@ int main(void)
 
 void spawn_random_block(uint16_t level)
 {
-		int16_t gameGrid[3][4] = {0};
+
 		LCD_SetTextColor(LCD_COLOR_BLACK);
 		LCD_SetFont(&Font16x24);
-		char blockNums[9] = {'1', '2', '3','4','5','6','7','8','9'};
+		char blockNums[10] = {'0','1', '2', '3','4','5','6','7','8','9'};
+
 		for (uint8_t i = 0; i<level;i++)
 		{
 			uint32_t randomNumberx = 0;
@@ -193,16 +202,22 @@ void spawn_random_block(uint16_t level)
 
 			LCD_Draw_Square_Fill((randomNumberx * 80), (randomNumbery * 80), 80, LCD_COLOR_BLACK);
 			LCD_Draw_Square_Fill(((randomNumberx * 80)+ 2), ((randomNumbery * 80) + 2), 76, LCD_COLOR_BLUE);
-			if (i > 9)
+			if (i > 8)
 			{
-				LCD_DisplayChar((randomNumberx * 80) + 27, (randomNumbery * 80) + 30, blockNums[i/10] );
-				LCD_DisplayChar((randomNumberx * 80) + 33, (randomNumbery * 80) + 30, blockNums[i%10] );
+
+				LCD_DisplayChar((randomNumberx * 80) + 25, (randomNumbery * 80) + 30, blockNums[i/9] );
+				LCD_DisplayChar((randomNumberx * 80) + 35, (randomNumbery * 80) + 30, blockNums[i%9] );
 			}
 			else
 			{
-				LCD_DisplayChar((randomNumberx * 80) + 30, (randomNumbery * 80) + 30, blockNums[i] );
+				LCD_DisplayChar((randomNumberx * 80) + 30, (randomNumbery * 80) + 30, blockNums[i+1] );
 			}
 		}
+
+}
+
+void remove_block(uint16_t number)
+{
 
 }
 /**
