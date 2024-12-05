@@ -105,23 +105,34 @@ int main(void)
 
   // game setup
   static bool aliveFlag = 1;
-  static uint16_t level = 1;
-  static bool gameGrid[12][8] = {0};
+  static uint16_t level_max = 12;
+
+
 
 
   //experiment and homescreen
+  for (uint16_t level = 1; level <= level_max; level++)
+  {
+	  spawn_random_block(level);
+  	  HAL_Delay(1000);
+  	  LCD_Clear(0, LCD_COLOR_WHITE);
+  }
 
-  LCD_Draw_Square_Fill(120, 120, 50, LCD_COLOR_BROWN);
-  HAL_Delay(500);
-  LCD_DrawMonkey(50, 100);
-  HAL_Delay(500);
+
+
+
+  HAL_Delay(5000);
   LCD_Clear(0, LCD_COLOR_WHITE);
   LCD_HomeScreen();
-  HAL_Delay(5000);
+  HAL_Delay(500);
   /* game screen   */
 
 
   //need to start timer
+
+
+
+
 
 /*
   while (aliveFlag && (level < 11))
@@ -130,28 +141,70 @@ int main(void)
 		  LCD_spawn_block();
 
 
+
 	  level++;
   }
-
 */
+
   /* End Screen */
 
-  uint32_t randomNumber;
+
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
+
+
 	  hrng.Instance = RNG;
-		if (HAL_RNG_Init(&hrng) != HAL_OK)
-		{
-		  Error_Handler();
-		}
-	  randomNumber = HAL_RNG_GetRandomNumber(&hrng);
+	  if (HAL_RNG_Init(&hrng) != HAL_OK)
+	  {
+	  		Error_Handler();
+	  }
+	  //randomNumber = HAL_RNG_GetRandomNumber(&hrng)%96;
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
 
+void spawn_random_block(uint16_t level)
+{
+		int16_t gameGrid[3][4] = {0};
+		LCD_SetTextColor(LCD_COLOR_BLACK);
+		LCD_SetFont(&Font16x24);
+		char blockNums[9] = {'1', '2', '3','4','5','6','7','8','9'};
+		for (uint8_t i = 0; i<level;i++)
+		{
+			uint32_t randomNumberx = 0;
+			uint32_t randomNumbery = 0;
+			hrng.Instance = RNG;
+			if (HAL_RNG_Init(&hrng) != HAL_OK)
+			{
+				Error_Handler();
+			}
+
+			do
+			{
+				randomNumbery = HAL_RNG_GetRandomNumber(&hrng)%4;
+				randomNumberx = HAL_RNG_GetRandomNumber(&hrng)%3;
+			} while (gameGrid[randomNumberx][randomNumbery] != 0);
+
+			gameGrid[randomNumberx][randomNumbery] = i+1;
+
+
+			LCD_Draw_Square_Fill((randomNumberx * 80), (randomNumbery * 80), 80, LCD_COLOR_BLACK);
+			LCD_Draw_Square_Fill(((randomNumberx * 80)+ 2), ((randomNumbery * 80) + 2), 76, LCD_COLOR_BLUE);
+			if (i > 9)
+			{
+				LCD_DisplayChar((randomNumberx * 80) + 27, (randomNumbery * 80) + 30, blockNums[i/10] );
+				LCD_DisplayChar((randomNumberx * 80) + 33, (randomNumbery * 80) + 30, blockNums[i%10] );
+			}
+			else
+			{
+				LCD_DisplayChar((randomNumberx * 80) + 30, (randomNumbery * 80) + 30, blockNums[i] );
+			}
+		}
+
+}
 /**
   * @brief System Clock Configuration
   * @retval None

@@ -48,13 +48,17 @@ void LCD_Visual_Demo(void)
 
 void LCD_spawn_block(void)
 {
+/*
+	hrng.Instance = RNG;
+	if (HAL_RNG_Init(&hrng) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	randomNumber = HAL_RNG_GetRandomNumber(&hrng)%96;
 
-	uint32_t randomNumber;
-	//HAL_RNG_GenerateRandomNumber(&hrng, &randomNumber);
+	LCD_Draw_Square_Fill(uint16_t Xpos, uint16_t Ypos, uint16_t length, uint16_t color);
 
-
-
-
+*/
 }
 
 void LCD_home_screen(void)

@@ -53,6 +53,7 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
+void spawn_random_block(uint16_t);
 
 /* USER CODE BEGIN EFP */
 
