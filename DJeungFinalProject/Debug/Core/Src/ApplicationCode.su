@@ -1,5 +1,9 @@
-../Core/Src/ApplicationCode.c:22:6:ApplicationInit	16	static
+../Core/Src/ApplicationCode.c:23:6:ApplicationInit	8	static
 ../Core/Src/ApplicationCode.c:44:6:LCD_Visual_Demo	8	static
-../Core/Src/ApplicationCode.c:49:6:LCD_spawn_block	4	static
-../Core/Src/ApplicationCode.c:64:6:LCD_home_screen	8	static
-../Core/Src/ApplicationCode.c:71:6:LCD_Touch_Polling_Demo	8	static
+../Core/Src/ApplicationCode.c:49:6:random_block	24	static
+../Core/Src/ApplicationCode.c:76:6:hide_numbers	16	static
+../Core/Src/ApplicationCode.c:83:6:generate_block	24	static
+../Core/Src/ApplicationCode.c:102:6:remove_block	16	static
+../Core/Src/ApplicationCode.c:109:6:LCD_Touch_Polling_Demo	8	static
+../Core/Src/ApplicationCode.c:130:6:LCDTouchScreenInterruptGPIOInit	32	static
+../Core/Src/ApplicationCode.c:155:6:EXTI15_10_IRQHandler	16	static

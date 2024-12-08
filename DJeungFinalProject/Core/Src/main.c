@@ -50,8 +50,6 @@ SPI_HandleTypeDef hspi5;
 
 TIM_HandleTypeDef htim6;
 TIM_HandleTypeDef htim7;
-static uint16_t gameGrid[3][4];
-
 
 /* USER CODE BEGIN PV */
 
@@ -59,7 +57,6 @@ static uint16_t gameGrid[3][4];
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-void SystemClockOverride(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C3_Init(void);
 static void MX_LTDC_Init(void);
@@ -92,8 +89,17 @@ int main(void)
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
+  /* USER CODE BEGIN Init */
 
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
   SystemClockOverride();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C3_Init();
@@ -102,59 +108,22 @@ int main(void)
   MX_SPI5_Init();
   MX_TIM6_Init();
   MX_TIM7_Init();
-  InitializeLCDTouch();
+  ApplicationInit();
   /* USER CODE BEGIN 2 */
-  ApplicationInit(); // Initializes the LCD functionality
-
-  // game setup
-  static bool aliveFlag = 1;
-  static uint16_t level_max = 12;
 
 
+for (uint16_t level = 1; level < 12; level++)
+{
+	//gameGrid_reset();
+	for (int i = level; i>0; i--)
+		random_block((i - 1), hrng);
 
-  //experiment and homescreen
-  spawn_random_block(12);
+	HAL_Delay(5000);
+	hide_numbers();
 
-  for (uint8_t i = 0; i<)
+	//wait_grid_empty();
 
-  HAL_Delay(10000);
-  LCD_Clear(0, LCD_COLOR_WHITE);
-  for (uint16_t level = 1; level <= level_max; level++)
-  {
-	  spawn_random_block(level);
-  	  HAL_Delay(1000);
-  	  LCD_Clear(0, LCD_COLOR_WHITE);
-  }
-
-
-
-
-  HAL_Delay(5000);
-  LCD_Clear(0, LCD_COLOR_WHITE);
-  LCD_HomeScreen();
-  HAL_Delay(500);
-  /* game screen   */
-
-
-  //need to start timer
-
-
-
-
-
-/*
-  while (aliveFlag && (level < 11))
-  {
-	  for (i = 1; i < level; i++)
-		  LCD_spawn_block();
-
-
-
-	  level++;
-  }
-*/
-
-  /* End Screen */
+}
 
 
   /* USER CODE BEGIN WHILE */
@@ -162,64 +131,11 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
-
-	  hrng.Instance = RNG;
-	  if (HAL_RNG_Init(&hrng) != HAL_OK)
-	  {
-	  		Error_Handler();
-	  }
-	  //randomNumber = HAL_RNG_GetRandomNumber(&hrng)%96;
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
 
-void spawn_random_block(uint16_t level)
-{
-
-		LCD_SetTextColor(LCD_COLOR_BLACK);
-		LCD_SetFont(&Font16x24);
-		char blockNums[10] = {'0','1', '2', '3','4','5','6','7','8','9'};
-
-		for (uint8_t i = 0; i<level;i++)
-		{
-			uint32_t randomNumberx = 0;
-			uint32_t randomNumbery = 0;
-			hrng.Instance = RNG;
-			if (HAL_RNG_Init(&hrng) != HAL_OK)
-			{
-				Error_Handler();
-			}
-
-			do
-			{
-				randomNumbery = HAL_RNG_GetRandomNumber(&hrng)%4;
-				randomNumberx = HAL_RNG_GetRandomNumber(&hrng)%3;
-			} while (gameGrid[randomNumberx][randomNumbery] != 0);
-
-			gameGrid[randomNumberx][randomNumbery] = i+1;
-
-
-			LCD_Draw_Square_Fill((randomNumberx * 80), (randomNumbery * 80), 80, LCD_COLOR_BLACK);
-			LCD_Draw_Square_Fill(((randomNumberx * 80)+ 2), ((randomNumbery * 80) + 2), 76, LCD_COLOR_BLUE);
-			if (i > 8)
-			{
-
-				LCD_DisplayChar((randomNumberx * 80) + 25, (randomNumbery * 80) + 30, blockNums[i/9] );
-				LCD_DisplayChar((randomNumberx * 80) + 35, (randomNumbery * 80) + 30, blockNums[i%9] );
-			}
-			else
-			{
-				LCD_DisplayChar((randomNumberx * 80) + 30, (randomNumbery * 80) + 30, blockNums[i+1] );
-			}
-		}
-
-}
-
-void remove_block(uint16_t number)
-{
-
-}
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -248,13 +164,13 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLQ = 7;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
-	Error_Handler();
+    Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-							  |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV8;
@@ -262,7 +178,7 @@ void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {
-	Error_Handler();
+    Error_Handler();
   }
 }
 
@@ -458,6 +374,35 @@ static void MX_SPI5_Init(void)
 
   /* USER CODE END SPI5_Init 2 */
 
+}
+
+void SystemClockOverride(void)
+{
+  RCC_ClkInitTypeDef RCC_ClkInitStruct;
+  RCC_OscInitTypeDef RCC_OscInitStruct;
+
+  __HAL_RCC_PWR_CLK_ENABLE();
+
+  // __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1); // not needed, power scaling consumption for when not running at max freq.
+
+  /* Enable HSE Osc and activate PLL with HSE source */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 336;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 7;
+  HAL_RCC_OscConfig(&RCC_OscInitStruct);
+
+  /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 clocks dividers */
+  RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+  HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
 }
 
 /**
@@ -725,36 +670,6 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-
-void SystemClockOverride(void)
-{
-  RCC_ClkInitTypeDef RCC_ClkInitStruct;
-  RCC_OscInitTypeDef RCC_OscInitStruct;
-
-  __HAL_RCC_PWR_CLK_ENABLE();
-
-  // __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1); // not needed, power scaling consumption for when not running at max freq.
-
-  /* Enable HSE Osc and activate PLL with HSE source */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 336;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 7;
-  HAL_RCC_OscConfig(&RCC_OscInitStruct);
-
-  /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 clocks dividers */
-  RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
-  HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
-}
-
 
 #ifdef  USE_FULL_ASSERT
 /**

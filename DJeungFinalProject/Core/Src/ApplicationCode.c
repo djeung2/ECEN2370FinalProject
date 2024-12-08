@@ -4,6 +4,7 @@
  *  Created on: Dec 30, 2023 (updated 11/12/2024) Thanks Donavon! 
  *      Author: Xavion
  */
+
 #include "ApplicationCode.h"
 
 /* Static variables */
@@ -21,7 +22,6 @@ void LCDTouchScreenInterruptGPIOInit(void);
 
 void ApplicationInit(void)
 {
-	 __HAL_RCC_RNG_CLK_ENABLE();
 	initialise_monitor_handles(); // Allows printf functionality
     LTCD__Init();
     LTCD_Layer_Init(0);
@@ -46,26 +46,64 @@ void LCD_Visual_Demo(void)
 	visualDemo();
 }
 
-void LCD_spawn_block(void)
+void random_block(uint16_t num, RNG_HandleTypeDef hrng)
 {
-/*
+
 	hrng.Instance = RNG;
 	if (HAL_RNG_Init(&hrng) != HAL_OK)
 	{
 		Error_Handler();
 	}
-	randomNumber = HAL_RNG_GetRandomNumber(&hrng)%96;
 
-	LCD_Draw_Square_Fill(uint16_t Xpos, uint16_t Ypos, uint16_t length, uint16_t color);
+	do
+	{
+		randomNumbery[num] = HAL_RNG_GetRandomNumber(&hrng)%4;
+		randomNumberx[num] = HAL_RNG_GetRandomNumber(&hrng)%3;
+	} while (gameGrid[randomNumberx[num]][randomNumbery[num]] != 0);
 
-*/
+	gameGrid[randomNumberx[num]][randomNumbery[num]] = num + 1;
+
+	generate_block(randomNumberx[num], randomNumbery[num], num + 1);
+
+	if (num == 0)
+	{
+		correctCenterx = (randomNumberx[num] * 80) + 40;
+		correctCentery = (randomNumbery[num] * 80) + 40;
+	}
+
 }
 
-void LCD_home_screen(void)
+void hide_numbers()
 {
-	LCD_Clear(0, LCD_COLOR_WHITE);
-
+	for (uint16_t x = 0; x<3; x++)
+		for (uint16_t y = 0; y<4; y++)
+			if (gameGrid[x][y] != 0)
+				LCD_Draw_Square_Fill(((x * 80)+ 2), ((y * 80) + 2), 76, LCD_COLOR_BLUE);
 }
+void generate_block	(uint16_t x, uint16_t y, uint16_t num)
+{
+	LCD_Draw_Square_Fill((x * 80), (y * 80), 80, LCD_COLOR_BLACK);
+	LCD_Draw_Square_Fill(((x * 80)+ 2), ((y * 80) + 2), 76, LCD_COLOR_BLUE);
+	LCD_SetTextColor(LCD_COLOR_BLACK);
+	LCD_SetFont(&Font16x24);
+	if (num > 9)
+	{
+
+		LCD_DisplayChar((x * 80) + 25, (y * 80) + 30, blockNums[num / 10] );
+		LCD_DisplayChar((x * 80) + 35, (y * 80) + 30, blockNums[num % 10] );
+	}
+	else
+	{
+		LCD_DisplayChar((x * 80) + 30, (y * 80) + 30, blockNums[num] );
+	}
+}
+
+
+void remove_block	(uint16_t x, uint16_t y)
+{
+	LCD_Draw_Square_Fill((x * 80), (y * 80), 80, LCD_COLOR_WHITE);
+}
+
 
 #if COMPILE_TOUCH_FUNCTIONS == 1
 void LCD_Touch_Polling_Demo(void)
@@ -148,13 +186,33 @@ void EXTI15_10_IRQHandler()
 		DetermineTouchPosition(&StaticTouchData);
 		/* Touch valid */
 		printf("\nX: %03d\nY: %03d \n", StaticTouchData.x, StaticTouchData.y);
-		LCD_Clear(0, LCD_COLOR_RED);
+		//LCD_Clear(0, LCD_COLOR_RED);
 
 	}else{
 
 		/* Touch not pressed */
 		printf("\nNot pressed \n");
-		LCD_Clear(0, LCD_COLOR_GREEN);
+
+
+
+		DetermineTouchPosition(&StaticTouchData);
+		if (((StaticTouchData.x - correctCenterx) > -40) && ((StaticTouchData.x - correctCenterx) < 40) && (((320 - StaticTouchData.y) - correctCentery) > -40) && (((320 - StaticTouchData.y) - correctCentery) < 40))
+		{
+			remove_block(randomNumberx[touchNum], randomNumbery[touchNum]);
+			touchNum++;
+			correctCenterx = randomNumberx[touchNum] * 80 + 40;
+			correctCentery = randomNumbery[touchNum] * 80 + 40;
+
+		}else
+		{
+			LCD_DrawMonkey(120, 140);
+			while (1);
+		}
+
+
+		//if	(((abs(StaticTouchData.x - correctCenterx)) < 20) && ((abs(StaticTouchData.y - correctCentery)) < 20))
+			//remove_block(1, 1);
+		//LCD_Clear(0, LCD_COLOR_GREEN);
 	}
 
 	STMPE811_Write(STMPE811_FIFO_STA, 0x01);

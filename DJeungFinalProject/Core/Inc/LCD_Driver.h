@@ -65,19 +65,19 @@ void LCD_SetFont(FONT_t *fonts);
 
 // Draw Circle Filled
 void LCD_Draw_Circle_Fill(uint16_t Xpos, uint16_t Ypos, uint16_t radius, uint16_t color);
-void LCD_Draw_Square_Fill(uint16_t Xpos, uint16_t Ypos, uint16_t length, uint16_t color);
 
 // Draw Vertical Line
 void LCD_Draw_Vertical_Line(uint16_t x, uint16_t y, uint16_t len, uint16_t color);
 void LCD_Clear(uint8_t LayerIndex, uint16_t Color);
 
+void LCD_Draw_Square_Fill(uint16_t Xpos, uint16_t Ypos, uint16_t length, uint16_t color);
+
+void LCD_DrawMonkey(uint16_t, uint16_t);
+
 void LCD_Error_Handler(void);
 
 // Demo using provided functions
 void visualDemo(void);
-
-void LCD_DrawMonkey(uint16_t x, uint16_t y);
-void LCD_HomeScreen(void);
 
 void LCD_Error_Handler(void);
 
