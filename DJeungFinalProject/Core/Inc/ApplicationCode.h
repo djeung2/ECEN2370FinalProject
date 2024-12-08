@@ -10,6 +10,7 @@
 
 
 #include <stdio.h>
+#include <stdbool.h>
 
 
 #ifndef INC_APPLICATIONCODE_H_
@@ -31,6 +32,10 @@ void LCD_Visual_Demo(void);
 void generate_block	(uint16_t, uint16_t, uint16_t);
 void remove_block	(uint16_t, uint16_t);
 void hide_numbers();
+void gameGrid_reset(void);
+bool check_grid_empty();
+void endscreen();
+void homescreen();
 
 #define abs(x) (x>0) ? (x) : (-x)
 

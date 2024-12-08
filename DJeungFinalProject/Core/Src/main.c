@@ -112,18 +112,27 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
-for (uint16_t level = 1; level < 12; level++)
-{
+/*
+	for (int i = 2; i>0; i--)
+		random_block((i), hrng);
+*/
+
+  homescreen();
+
+  for (uint16_t level = 1; level <= 12; level++)
+  {
 	//gameGrid_reset();
 	for (int i = level; i>0; i--)
-		random_block((i - 1), hrng);
+		random_block((i), hrng);
 
-	HAL_Delay(5000);
+	HAL_Delay(1000);
 	hide_numbers();
 
-	//wait_grid_empty();
+	while(check_grid_empty() == 0);
 
-}
+  }
+
+  endscreen();
 
 
   /* USER CODE BEGIN WHILE */

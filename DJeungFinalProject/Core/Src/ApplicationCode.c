@@ -46,6 +46,34 @@ void LCD_Visual_Demo(void)
 	visualDemo();
 }
 
+void gameGrid_reset(void)
+{
+	LCD_Clear(0,LCD_COLOR_WHITE);
+	for (uint8_t row = 0; row < 3; row++)
+		for (uint8_t col = 0; col<4; col++)
+			gameGrid[row][col] = 0;
+}
+
+bool check_grid_empty()
+{
+	for (uint8_t row = 0; row < 4; row++)
+		for (uint8_t col = 0; col<3; col++)
+			if (gameGrid[col][row] != 0)
+				return 0;
+	touchNum = 0;
+	return 1;
+}
+
+void homescreen()
+{
+
+}
+
+void endscreen()
+{
+
+}
+
 void random_block(uint16_t num, RNG_HandleTypeDef hrng)
 {
 
@@ -54,6 +82,8 @@ void random_block(uint16_t num, RNG_HandleTypeDef hrng)
 	{
 		Error_Handler();
 	}
+
+	num--;
 
 	do
 	{
@@ -65,11 +95,7 @@ void random_block(uint16_t num, RNG_HandleTypeDef hrng)
 
 	generate_block(randomNumberx[num], randomNumbery[num], num + 1);
 
-	if (num == 0)
-	{
-		correctCenterx = (randomNumberx[num] * 80) + 40;
-		correctCentery = (randomNumbery[num] * 80) + 40;
-	}
+
 
 }
 
@@ -193,15 +219,17 @@ void EXTI15_10_IRQHandler()
 		/* Touch not pressed */
 		printf("\nNot pressed \n");
 
-
+		correctCenterx = randomNumberx[touchNum] * 80 + 40;
+		correctCentery = randomNumbery[touchNum] * 80 + 40;
 
 		DetermineTouchPosition(&StaticTouchData);
 		if (((StaticTouchData.x - correctCenterx) > -40) && ((StaticTouchData.x - correctCenterx) < 40) && (((320 - StaticTouchData.y) - correctCentery) > -40) && (((320 - StaticTouchData.y) - correctCentery) < 40))
 		{
 			remove_block(randomNumberx[touchNum], randomNumbery[touchNum]);
+			gameGrid[randomNumberx[touchNum]][randomNumbery[touchNum]] = 0;
+
+
 			touchNum++;
-			correctCenterx = randomNumberx[touchNum] * 80 + 40;
-			correctCentery = randomNumbery[touchNum] * 80 + 40;
 
 		}else
 		{
@@ -214,6 +242,7 @@ void EXTI15_10_IRQHandler()
 			//remove_block(1, 1);
 		//LCD_Clear(0, LCD_COLOR_GREEN);
 	}
+
 
 	STMPE811_Write(STMPE811_FIFO_STA, 0x01);
 	STMPE811_Write(STMPE811_FIFO_STA, 0x00);
