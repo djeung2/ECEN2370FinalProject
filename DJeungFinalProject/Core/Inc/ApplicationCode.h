@@ -23,6 +23,7 @@ static uint16_t	touchNum = 0;
 static uint16_t gameGrid[3][4] = {0};
 static uint32_t randomNumberx[12] = {0};
 static uint32_t randomNumbery[12] = {0};
+static bool	startGame_flag = 0;
 
 
 

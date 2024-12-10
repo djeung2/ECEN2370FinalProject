@@ -66,11 +66,61 @@ bool check_grid_empty()
 
 void homescreen()
 {
+	LCD_Clear(0,LCD_COLOR_WHITE);
+	LCD_SetTextColor(LCD_COLOR_BLACK);
+	LCD_SetFont(&Font16x24);
+
+	LCD_DrawMonkey(120, 160);
+
+	LCD_DisplayChar(90, 50, 'C');
+	LCD_DisplayChar(105, 50, 'H');
+	LCD_DisplayChar(120, 50, 'I');
+	LCD_DisplayChar(135, 50, 'M');
+	LCD_DisplayChar(150, 50, 'P');
+
+	LCD_DisplayChar(100, 70, 'T');
+	LCD_DisplayChar(115, 70, 'E');
+	LCD_DisplayChar(130, 70, 'S');
+	LCD_DisplayChar(145, 70, 'T');
+
+	LCD_DisplayChar(90, 200, 'P');
+	LCD_DisplayChar(105, 200, 'R');
+	LCD_DisplayChar(120, 200, 'E');
+	LCD_DisplayChar(135, 200, 'S');
+	LCD_DisplayChar(150, 200, 'S');
+
+	LCD_DisplayChar(110, 220, 'T');
+	LCD_DisplayChar(125, 220, 'O');
+
+	LCD_DisplayChar(90, 240, 'S');
+	LCD_DisplayChar(105, 240, 'T');
+	LCD_DisplayChar(120, 240, 'A');
+	LCD_DisplayChar(135, 240, 'R');
+	LCD_DisplayChar(150, 240, 'T');
+
+	while (startGame_flag == 0);
 
 }
 
 void endscreen()
 {
+	LCD_Clear(0,LCD_COLOR_WHITE);
+	LCD_DrawMonkey(120, 140);
+
+	LCD_DisplayChar(80,80,'U');
+	LCD_DisplayChar(95,80,'H');
+
+	LCD_DisplayChar(125,80,'O');
+	LCD_DisplayChar(140,80,'H');
+
+	LCD_DisplayChar(60,200,'Y');
+	LCD_DisplayChar(75,200,'O');
+	LCD_DisplayChar(90,200,'U');
+
+	LCD_DisplayChar(120,200,'L');
+	LCD_DisplayChar(135,200,'O');
+	LCD_DisplayChar(150,200,'S');
+	LCD_DisplayChar(165,200,'T');
 
 }
 
@@ -174,6 +224,20 @@ void LCDTouchScreenInterruptGPIOInit(void)
 
 }
 
+void makeLevel(uint16_t level, RNG_HandleTypeDef hrng)
+{
+	//gameGrid_reset();
+
+	for (int i = level; i>0; i--)
+		random_block((i), hrng);
+
+	HAL_Delay(1000);
+	hide_numbers();
+
+
+	while(check_grid_empty() == 0);
+}
+
 #define TOUCH_DETECTED_IRQ_STATUS_BIT   (1 << 0)  // Touchscreen detected bitmask
 
 static uint8_t statusFlag;
@@ -216,26 +280,32 @@ void EXTI15_10_IRQHandler()
 
 	}else{
 
-		/* Touch not pressed */
-		printf("\nNot pressed \n");
 
-		correctCenterx = randomNumberx[touchNum] * 80 + 40;
-		correctCentery = randomNumbery[touchNum] * 80 + 40;
-
-		DetermineTouchPosition(&StaticTouchData);
-		if (((StaticTouchData.x - correctCenterx) > -40) && ((StaticTouchData.x - correctCenterx) < 40) && (((320 - StaticTouchData.y) - correctCentery) > -40) && (((320 - StaticTouchData.y) - correctCentery) < 40))
+		if (startGame_flag)
 		{
-			remove_block(randomNumberx[touchNum], randomNumbery[touchNum]);
-			gameGrid[randomNumberx[touchNum]][randomNumbery[touchNum]] = 0;
+			correctCenterx = randomNumberx[touchNum] * 80 + 40;
+			correctCentery = randomNumbery[touchNum] * 80 + 40;
+
+			DetermineTouchPosition(&StaticTouchData);
+			if (((StaticTouchData.x - correctCenterx) > -40) && ((StaticTouchData.x - correctCenterx) < 40) && (((320 - StaticTouchData.y) - correctCentery) > -40) && (((320 - StaticTouchData.y) - correctCentery) < 40))
+			{
+				remove_block(randomNumberx[touchNum], randomNumbery[touchNum]);
+				gameGrid[randomNumberx[touchNum]][randomNumbery[touchNum]] = 0;
+				touchNum++;
+
+				// wait a little bit for debounce
 
 
-			touchNum++;
-
+			}else
+			{
+				endscreen();
+				while (1);
+			}
 		}else
 		{
-			LCD_DrawMonkey(120, 140);
-			while (1);
+			startGame_flag = 1;
 		}
+
 
 
 		//if	(((abs(StaticTouchData.x - correctCenterx)) < 20) && ((abs(StaticTouchData.y - correctCentery)) < 20))
