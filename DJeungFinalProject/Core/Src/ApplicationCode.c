@@ -105,22 +105,33 @@ void homescreen()
 void endscreen()
 {
 	LCD_Clear(0,LCD_COLOR_WHITE);
-	LCD_DrawMonkey(120, 140);
+	LCD_DrawMonkey(120, 120);
 
-	LCD_DisplayChar(80,80,'U');
-	LCD_DisplayChar(95,80,'H');
+	LCD_DisplayChar(80,50,'U');
+	LCD_DisplayChar(95,50,'H');
 
-	LCD_DisplayChar(125,80,'O');
-	LCD_DisplayChar(140,80,'H');
+	LCD_DisplayChar(125,50,'O');
+	LCD_DisplayChar(140,50,'H');
 
-	LCD_DisplayChar(60,200,'Y');
-	LCD_DisplayChar(75,200,'O');
-	LCD_DisplayChar(90,200,'U');
+	LCD_DisplayChar(60,180,'Y');
+	LCD_DisplayChar(75,180,'O');
+	LCD_DisplayChar(90,180,'U');
 
-	LCD_DisplayChar(120,200,'L');
-	LCD_DisplayChar(135,200,'O');
-	LCD_DisplayChar(150,200,'S');
-	LCD_DisplayChar(165,200,'T');
+	LCD_DisplayChar(120,180,'L');
+	LCD_DisplayChar(135,180,'O');
+	LCD_DisplayChar(150,180,'S');
+	LCD_DisplayChar(165,180,'T');
+
+	LCD_DisplayChar(50,210,'L');
+	LCD_DisplayChar(65,210,'E');
+	LCD_DisplayChar(80,210,'V');
+	LCD_DisplayChar(95,210,'E');
+	LCD_DisplayChar(110,210,'L');
+	LCD_DisplayChar(120,210,':');
+	LCD_DisplayChar(135, 210, blockNums[level_current]);
+
+	printTime();
+
 
 }
 
@@ -199,6 +210,18 @@ void LCD_Touch_Polling_Demo(void)
 	}
 }
 
+void printTime()
+{
+	uint32_t gameDuration =  timePlayed;
+	uint32_t printnum = 0;
+	for (uint8_t i = 0; i < 5; i++)
+	{
+		printnum = gameDuration % 10;
+		LCD_DisplayChar(150 - (20 * i), 280, blockNums[printnum] );
+		gameDuration = gameDuration / 10;
+	}
+}
+
 
 // TouchScreen Interrupt
 #if TOUCH_INTERRUPT_ENABLED == 1
@@ -224,18 +247,22 @@ void LCDTouchScreenInterruptGPIOInit(void)
 
 }
 
-void makeLevel(uint16_t level, RNG_HandleTypeDef hrng)
+void makeLevel(uint16_t current, RNG_HandleTypeDef hrng)
 {
 	//gameGrid_reset();
 
-	for (int i = level; i>0; i--)
+
+	for (uint8_t i = current; i>0; i--)
 		random_block((i), hrng);
 
 	HAL_Delay(1000);
 	hide_numbers();
 
-
+	numbersCovered_flag = 1;
 	while(check_grid_empty() == 0);
+	numbersCovered_flag = 0;
+	level_current = level_current + 1;
+	HAL_Delay(1000);
 }
 
 #define TOUCH_DETECTED_IRQ_STATUS_BIT   (1 << 0)  // Touchscreen detected bitmask
@@ -283,24 +310,34 @@ void EXTI15_10_IRQHandler()
 
 		if (startGame_flag)
 		{
-			correctCenterx = randomNumberx[touchNum] * 80 + 40;
-			correctCentery = randomNumbery[touchNum] * 80 + 40;
-
-			DetermineTouchPosition(&StaticTouchData);
-			if (((StaticTouchData.x - correctCenterx) > -40) && ((StaticTouchData.x - correctCenterx) < 40) && (((320 - StaticTouchData.y) - correctCentery) > -40) && (((320 - StaticTouchData.y) - correctCentery) < 40))
+			//case: numbers are still showing
+			if (numbersCovered_flag == 0)
 			{
-				remove_block(randomNumberx[touchNum], randomNumbery[touchNum]);
-				gameGrid[randomNumberx[touchNum]][randomNumbery[touchNum]] = 0;
-				touchNum++;
 
-				// wait a little bit for debounce
-
-
-			}else
-			{
-				endscreen();
-				while (1);
 			}
+			else{
+				correctCenterx = randomNumberx[touchNum] * 80 + 40;
+				correctCentery = randomNumbery[touchNum] * 80 + 40;
+				DetermineTouchPosition(&StaticTouchData);
+				if (((StaticTouchData.x - correctCenterx) > -40) && ((StaticTouchData.x - correctCenterx) < 40) && (((320 - StaticTouchData.y) - correctCentery) > -40) && (((320 - StaticTouchData.y) - correctCentery) < 40))
+				{
+					remove_block(randomNumberx[touchNum], randomNumbery[touchNum]);
+					gameGrid[randomNumberx[touchNum]][randomNumbery[touchNum]] = 0;
+					touchNum++;
+
+					// wait a little bit for debounce
+				}else
+				{
+
+					//alive_flag = 0;
+					HAL_StatusTypeDef HAL_TIM_Base_Stop(TIM_HandleTypeDef *htim7);
+
+					endscreen();
+					startGame_flag = 0;
+
+				}
+			}
+
 		}else
 		{
 			startGame_flag = 1;
@@ -328,6 +365,13 @@ void EXTI15_10_IRQHandler()
 	WriteDataToTouchModule(STMPE811_INT_STA, clearIRQData);
 
 }
+
+void TIM7_IRQHandler()
+{
+	TIM7 -> SR = 0;
+	timePlayed++;
+}
+
 #endif // TOUCH_INTERRUPT_ENABLED
 #endif // COMPILE_TOUCH_FUNCTIONS
 

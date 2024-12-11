@@ -47,9 +47,9 @@ LTDC_HandleTypeDef hltdc;
 RNG_HandleTypeDef hrng;
 
 SPI_HandleTypeDef hspi5;
-
 TIM_HandleTypeDef htim6;
-TIM_HandleTypeDef htim7;
+
+
 
 /* USER CODE BEGIN PV */
 
@@ -106,6 +106,7 @@ int main(void)
   MX_TIM6_Init();
   MX_TIM7_Init();
   ApplicationInit();
+
   /* USER CODE BEGIN 2 */
 
 
@@ -117,25 +118,35 @@ int main(void)
   homescreen();
 
 
-  LCD_Clear(0,LCD_COLOR_WHITE);
+	LCD_Clear(0,LCD_COLOR_WHITE);
 
-  for (uint16_t level = 1; level <= 12; level++)
+	HAL_StatusTypeDef HAL_TIM_Base_Start(TIM_HandleTypeDef *htim7);
+	if (HAL_TIM_Base_Start(&htim7) != HAL_OK)
+	{
+		Error_Handler();
+	}
+
+
+  for (level = 1; level <= 12; level++)
   {
 	makeLevel(level, hrng);
+
   }
 
 
+
+
+  //success_screen();
 
 
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
+  while (1);
 
-    /* USER CODE BEGIN 3 */
-  }
   /* USER CODE END 3 */
 }
+
+
+
 
 /**
   * @brief System Clock Configuration
@@ -461,22 +472,28 @@ static void MX_TIM7_Init(void)
   /* USER CODE BEGIN TIM7_Init 1 */
 
   /* USER CODE END TIM7_Init 1 */
+
   htim7.Instance = TIM7;
-  htim7.Init.Prescaler = 0;
+  htim7.Instance->DIER = 1;
+  htim7.Init.Prescaler = 1250;
   htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim7.Init.Period = 65535;
   htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim7.Instance->PSC = 6249999;
   if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
   {
     Error_Handler();
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  HAL_NVIC_EnableIRQ(TIM7_IRQn);
   if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
   }
   /* USER CODE BEGIN TIM7_Init 2 */
+  TIM7 -> DIER |= 0x1;
+
 
   /* USER CODE END TIM7_Init 2 */
 
