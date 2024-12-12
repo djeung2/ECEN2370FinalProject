@@ -99,7 +99,7 @@ void homescreen()
 	LCD_DisplayChar(150, 240, 'T');
 
 	while (startGame_flag == 0);
-
+	LCD_Clear(0,LCD_COLOR_WHITE);
 }
 
 void endscreen()
@@ -130,6 +130,20 @@ void endscreen()
 	LCD_DisplayChar(120,210,':');
 	LCD_DisplayChar(135, 210, blockNums[level_current]);
 
+	LCD_DisplayChar(20,240,'S');
+	LCD_DisplayChar(35,240,'E');
+	LCD_DisplayChar(50,240,'C');
+	LCD_DisplayChar(65,240,'O');
+	LCD_DisplayChar(80,240,'N');
+	LCD_DisplayChar(95,240,'D');
+	LCD_DisplayChar(110,240,'S');
+
+	LCD_DisplayChar(140,240,'P');
+	LCD_DisplayChar(155,240,'L');
+	LCD_DisplayChar(170,240,'A');
+	LCD_DisplayChar(185,240,'Y');
+	LCD_DisplayChar(200,240,'E');
+	LCD_DisplayChar(215,240,'D');
 	printTime();
 
 
@@ -141,7 +155,7 @@ void random_block(uint16_t num, RNG_HandleTypeDef hrng)
 	hrng.Instance = RNG;
 	if (HAL_RNG_Init(&hrng) != HAL_OK)
 	{
-		Error_Handler();
+		LCD_Error_Handler();
 	}
 
 	num--;
@@ -319,7 +333,7 @@ void EXTI15_10_IRQHandler()
 				correctCenterx = randomNumberx[touchNum] * 80 + 40;
 				correctCentery = randomNumbery[touchNum] * 80 + 40;
 				DetermineTouchPosition(&StaticTouchData);
-				if (((StaticTouchData.x - correctCenterx) > -40) && ((StaticTouchData.x - correctCenterx) < 40) && (((320 - StaticTouchData.y) - correctCentery) > -40) && (((320 - StaticTouchData.y) - correctCentery) < 40))
+				if (((StaticTouchData.x - correctCenterx) > -50) && ((StaticTouchData.x - correctCenterx) < 50) && (((320 - StaticTouchData.y) - correctCentery) > -50) && (((320 - StaticTouchData.y) - correctCentery) < 50))
 				{
 					remove_block(randomNumberx[touchNum], randomNumbery[touchNum]);
 					gameGrid[randomNumberx[touchNum]][randomNumbery[touchNum]] = 0;

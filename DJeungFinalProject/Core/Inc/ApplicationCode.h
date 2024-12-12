@@ -9,6 +9,7 @@
 #include "stm32f4xx_hal.h"
 
 
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -27,10 +28,10 @@ static uint16_t gameGrid[3][4] = {0};
 static uint32_t randomNumberx[12] = {0};
 static uint32_t randomNumbery[12] = {0};
 static bool	startGame_flag = 0;
-static numbersCovered_flag = 0;
+static bool numbersCovered_flag = 0;
 static uint16_t level = 1;
 static uint16_t level_current = 1;
-static volatile TIM_HandleTypeDef htim7;
+static TIM_HandleTypeDef htim7;
 static uint32_t timePlayed = -1;
 
 

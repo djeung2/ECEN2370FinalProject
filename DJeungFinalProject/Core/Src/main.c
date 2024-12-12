@@ -64,19 +64,7 @@ static void MX_RNG_Init(void);
 static void MX_SPI5_Init(void);
 static void MX_TIM6_Init(void);
 static void MX_TIM7_Init(void);
-/* USER CODE BEGIN PFP */
 
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
-
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
 int main(void)
 {
 
@@ -118,7 +106,7 @@ int main(void)
   homescreen();
 
 
-	LCD_Clear(0,LCD_COLOR_WHITE);
+
 
 	HAL_StatusTypeDef HAL_TIM_Base_Start(TIM_HandleTypeDef *htim7);
 	if (HAL_TIM_Base_Start(&htim7) != HAL_OK)
@@ -135,15 +123,13 @@ int main(void)
 
 
 
-
   //success_screen();
-
-
   /* USER CODE BEGIN WHILE */
   while (1);
 
-  /* USER CODE END 3 */
 }
+  /* USER CODE END 3 */
+
 
 
 
@@ -422,13 +408,9 @@ void SystemClockOverride(void)
   * @param None
   * @retval None
   */
+
 static void MX_TIM6_Init(void)
 {
-
-  /* USER CODE BEGIN TIM6_Init 0 */
-
-  /* USER CODE END TIM6_Init 0 */
-
   TIM_MasterConfigTypeDef sMasterConfig = {0};
 
   /* USER CODE BEGIN TIM6_Init 1 */
